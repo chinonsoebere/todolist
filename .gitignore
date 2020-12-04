@@ -1,3 +1,6 @@
 app.js
-node_modules
+/node_modules
 Package-lock.json
+npm-debug.log
+.DS_Store
+/*.env
