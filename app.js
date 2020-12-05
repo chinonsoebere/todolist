@@ -129,6 +129,7 @@ app.get('/:customListName', function(req, res) {
         res.redirect("/" + req.params.customListName);
       } else if (foundList.items.length === 0) {
         //populate the todolist with Default instructions
+        var itemID = foundList.id;
         OtherItem.updateOne({
           _id: itemID
         }, {
