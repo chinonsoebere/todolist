@@ -72,7 +72,7 @@ app.get("/", function(req, res) {
         }
         //we use this so that home route would not remain empty.
         res.redirect("/");
-       });
+      });
     } else {
       res.render("list", {
         title: "To Do List",
@@ -117,30 +117,48 @@ app.get('/:customListName', function(req, res) {
 
   OtherItem.findOne({
     name: requestedList
-  }, function(err, foundList) {
+  }, (err, foundList) => {
 
     if (!err) {
       if (!foundList) {
-        //console.log("Does not Exist")
         const otherItem = new OtherItem({
           name: requestedList,
           items: defaultItems
         })
         otherItem.save();
         res.redirect("/" + req.params.customListName);
+      } else if (foundList.items.length === 0) {
+        //populate the todolist with Default instructions
+        OtherItem.updateOne({
+          _id: itemID
+        }, {
+          $push: {
+            items: {
+              $each: defaultItems
+            }
+          }
+        }, (err) => {
+          if (err) {
+            console.log(err)
+          } else {
+            res.redirect("/" + req.params.customListName);
+          }
+        })
+
       } else {
-        //console.log("Exists")
         res.render("list", {
           title: fxns.capitalize(foundList.name),
           listTitle: foundList.name,
           newListItems: foundList.items
-        });
+        })
       }
-
+    } else {
+      console.log(err)
     }
   })
 
 });
+
 
 
 
@@ -189,5 +207,5 @@ app.post("/delete", function(req, res) {
 // }
 
 app.listen(process.env.PORT || 3000, function() {
-    console.log("Server has started successfully");
+  console.log("Server has started successfully");
 });
